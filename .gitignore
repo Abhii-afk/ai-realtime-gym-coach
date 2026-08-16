@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+/.venv/
+/venv/
+
+# Data & secrets
+.env
+data.db
+.streamlit/secrets.toml
+
+# Distribution / specific
+*.exe
+*.dll
+*.so
+*.desktop
