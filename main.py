@@ -275,12 +275,27 @@ def main():
 
     else:
         exercise = st.session_state.get("exercise_type", "Squats")
-        
+            
+        # Run a MediaPipe native-library check in the main process so
+        # the app can render a helpful diagnostic message instead of
+        # Streamlit's redacted worker error when the shared library fails
+        try:
+            from services.vision.mediapipe_diag import validate_mediapipe
+
+            ok, diag_msg = validate_mediapipe()
+            if not ok:
+                st.error("MediaPipe native library check failed. See diagnostics below.")
+                st.code(diag_msg)
+                st.stop()
+        except Exception as e:
+            st.error(f"Unexpected error running MediaPipe diagnostics: {e}")
+            st.stop()
+
         def processor_factory():
             processor = VideoProcessorClass()
             processor.set_exercise(exercise)
             return processor
-        
+            
         context = webrtc_streamer(
                 key = "exercise-analysis",
                 mode = WebRtcMode.SENDRECV,

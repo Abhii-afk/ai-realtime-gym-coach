@@ -33,7 +33,31 @@ class VideoProcessorClass(VideoProcessorBase):
             output_segmentation_masks=False,
         )
 
-        self._landmarker = vision.PoseLandmarker.create_from_options(options)
+        try:
+            self._landmarker = vision.PoseLandmarker.create_from_options(options)
+        except Exception as e:
+            import sys, platform, traceback
+            details = [
+                f"Underlying exception: {e}",
+                f"Python: {sys.version}",
+                f"Platform: {platform.platform()}",
+                f"mediapipe.__version__: {getattr(mp, '__version__', 'unknown')}",
+                f"model_path exists: {os.path.exists(model_path)} ({model_path})",
+            ]
+            # Try to surface mediapipe_c_bindings location if available
+            try:
+                from mediapipe.tasks.python.core import mediapipe_c_bindings
+                details.append(f"mediapipe_c_bindings.__file__: {getattr(mediapipe_c_bindings, '__file__', None)}")
+            except Exception as ee:
+                details.append(f"Could not inspect mediapipe_c_bindings: {ee}")
+
+            # Attach the original traceback
+            tb = ''.join(traceback.format_exception(type(e), e, e.__traceback__))
+            details.append("--- Traceback ---")
+            details.append(tb)
+
+            # Raise a new error that will be easier to debug in logs
+            raise RuntimeError("MediaPipe PoseLandmarker failed to initialize.\n" + "\n".join(details)) from e
 
         self._detectors = {
             "Squats": SquatDetector(),
