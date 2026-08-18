@@ -2,3 +2,4 @@ libgl1
 libgl1-mesa-dri
 libglib2.0-0t64
 libgles2-mesa
+libegl1-mesa
