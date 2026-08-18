@@ -1,8 +1,7 @@
 streamlit
 streamlit-webrtc
-mediapipe==0.10.14
-opencv-python-headless==4.10.0.84
-numpy<2.0.0
+mediapipe
+numpy
 pandas
 groq
 gtts
